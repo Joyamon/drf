@@ -38,24 +38,34 @@ def get_id(response):
     return ids
 
 
+def get_params(response, id):
+    refundAmount = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundAmount']
+    refundState = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundState']
+    originalSku = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['originalSku']
+    applicant = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundNotes']['applicant']
+    applyAmount = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundNotes'][
+        'applyAmount']
+    applyTime = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundNotes']['applyTime']
+    applyNotes = response['order']['YA028-5085515-5469931']['data']['orderRefund'][f'{id}']['refundNotes']['applyNotes']
+    return refundAmount, refundState, originalSku, applicant, applyAmount, applyTime, applyNotes
+
+
 def structure_params_data(response):
-    params_temp={}
+    params_temp = {}
     for i in range(get_long(response)):
         for id in get_id(response):
+            params = get_params(response, id)
             temp = {
-                f"orderData[updateOrderRefund][{id}][refundAmount]": 400,
-                f"orderData[updateOrderRefund][{id}][refundState]": 1,
-                f"orderData[updateOrderRefund][{id}][originalSku]": "UUU0152825004",
-                f"orderData[updateOrderRefund][{id}][refundNotes][applicant]": "曹阳",
-                f"orderData[updateOrderRefund][{id}][refundNotes][applyAmount]": 300,
-                f"orderData[updateOrderRefund][{id}][refundNotes][applyTime]": "2023-12-23 11:23:10",
-                f"orderData[updateOrderRefund][{id}][refundNotes][applyNotes]": "BuyerCancelled",
+                f"orderData[updateOrderRefund][{id}][refundAmount]": params[0],
+                f"orderData[updateOrderRefund][{id}][refundState]": params[1],
+                f"orderData[updateOrderRefund][{id}][originalSku]": params[2],
+                f"orderData[updateOrderRefund][{id}][refundNotes][applicant]": params[3],
+                f"orderData[updateOrderRefund][{id}][refundNotes][applyAmount]": params[4],
+                f"orderData[updateOrderRefund][{id}][refundNotes][applyTime]": params[5],
+                f"orderData[updateOrderRefund][{id}][refundNotes][applyNotes]": params[6],
                 f"orderData[updateOrderRefund][{id}][paymentCurrency]": "EUR",
             }
             params_temp.update(temp)
 
     params_temp["orderData[globalOrder]"] = "YA028-5085515-5469931"
     return params_temp
-
-
-print(structure_params_data(select_Order()))

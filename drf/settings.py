@@ -131,4 +131,5 @@ REST_FRAMEWORK = {
         'drf.custom_authentication.CustomAuthentication',  # 添加自定义认证类
 
     ],
+    'VERSION_PARAM': 'version',  # 版本
 }

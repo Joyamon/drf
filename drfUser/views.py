@@ -6,9 +6,11 @@ from django.contrib.auth.models import Group, User
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
+from rest_framework.versioning import QueryParameterVersioning
 
 
 class UserView(APIView):
+    versioning_class = QueryParameterVersioning  # 版本
 
     def get(self, request):
         users = User.objects.all()
@@ -91,25 +93,33 @@ class UserViewDetails(APIView):
 
 
 class GroupView(APIView):
-
+    versioning_class = QueryParameterVersioning
 
     def get(self, request, **kwargs):
-        if kwargs.get('pk'):
-            group = Group.objects.get(pk=kwargs['pk'])
-            serializer = GroupSerializer(group)
+        try:
+            if kwargs.get('pk') and request.version == 'v1.0':
+                group = Group.objects.get(pk=kwargs['pk'])
+                serializer = GroupSerializer(group)
+                return Response(
+                    {'data': serializer.data,
+                     'status': status.HTTP_200_OK,
+                     'message': 'Success'
+                     }
+                )
+            elif request.version == 'v1.0':
+                group = Group.objects.all()
+                serializer = GroupSerializer(group, many=True)
+                return Response(
+                    {'data': serializer.data,
+                     'status': status.HTTP_200_OK,
+                     'message': 'Success'
+                     }
+                )
+        except Group.DoesNotExist:
             return Response(
-                {'data': serializer.data,
-                 'status': status.HTTP_200_OK,
-                 'message': 'Success'
-                 }
-            )
-        else:
-            group = Group.objects.all()
-            serializer = GroupSerializer(group, many=True)
-            return Response(
-                {'data': serializer.data,
-                 'status': status.HTTP_200_OK,
-                 'message': 'Success'
+                {'data': [],
+                 'status': status.HTTP_404_NOT_FOUND,
+                 'message': 'Data is not exists'
                  }
             )
 
