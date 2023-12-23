@@ -92,7 +92,6 @@ class UserViewDetails(APIView):
 
 class GroupView(APIView):
 
-
     def get(self, request, **kwargs):
         if kwargs.get('pk'):
             group = Group.objects.get(pk=kwargs['pk'])
