@@ -226,14 +226,19 @@ class CreateTaskView(APIView):
         task_name = request.data.get("task_name")
         task_kwargs = {
             "task_name": task_name,
-            "arg1": request.data.get("arg1"),
-            "arg2": request.data.get("arg2"),
         }
+        task_args = request.data.get('args')
         # 定时任务规则
         cron_value = request.data.get("task_cron")
         cro_list = str(cron_value).split(' ')
         if len(list(cro_list)) != 5:
-            return Response({"code": 3003, "msg": "task_cron 不合法"})
+            return Response(
+                {
+                    'code': 400,
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': 'cron is not correct,example: */2 * * * *'
+                }
+            )
         cron_time = {
             'minute': cro_list[0],  # 每2分钟执行一次
             'hour': cro_list[1],
@@ -246,20 +251,38 @@ class CreateTaskView(APIView):
         # 任务和 schedule 关联
         task_obj = PeriodicTask.objects.filter(name=task_name)
         if task_obj:
-            return JsonResponse({"code": 3000, "msg": "task name exist"})
+            return JsonResponse(
+                {
+                    'code': 400,
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': 'task is exist'
+                }
+            )
 
         task_obj, created = PeriodicTask.objects.get_or_create(
             name=task_name,  # 名称保持唯一
             task="drfUser.tasks.run_test",  # 任务的注册路径
             crontab=schedule,
             enabled=True,  # 是否开启任务
-            # args=json.dumps(task_args),
             kwargs=json.dumps(task_kwargs),
+            args=json.dumps(task_args),
             # 任务过期时间，设置当前时间往后1天
             # expires=datetime.datetime.now() + datetime.timedelta(days=1),
             expires=timezone.now() + datetime.timedelta(days=1),
         )
         if created:
-            return JsonResponse({"code": 0, "msg": "success"})
+            return Response(
+                {
+                    'code': 200,
+                    'status': status.HTTP_200_OK,
+                    'message': 'create success'
+                }
+            )
         else:
-            return JsonResponse({"code": 111, "msg": "create failed"})
+            return Response(
+                {
+                    'code': 400,
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': 'create fail'
+                }
+            )
