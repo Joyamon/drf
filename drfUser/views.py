@@ -234,7 +234,7 @@ class CreateTaskView(APIView):
         if len(list(cro_list)) != 5:
             return Response(
                 {
-                    'code': 400,
+                    'data': [],
                     'status': status.HTTP_400_BAD_REQUEST,
                     'message': 'cron is not correct,example: */2 * * * *'
                 }
@@ -244,7 +244,8 @@ class CreateTaskView(APIView):
             'hour': cro_list[1],
             'day_of_week': cro_list[2],
             'day_of_month': cro_list[3],
-            'month_of_year': cro_list[4]
+            'month_of_year': cro_list[4],
+
         }
         # 写入 schedule表
         schedule = CrontabSchedule.objects.create(**cron_time)
@@ -253,7 +254,7 @@ class CreateTaskView(APIView):
         if task_obj:
             return JsonResponse(
                 {
-                    'code': 400,
+                    'data': [],
                     'status': status.HTTP_400_BAD_REQUEST,
                     'message': 'task is exist'
                 }
@@ -268,12 +269,12 @@ class CreateTaskView(APIView):
             args=json.dumps(task_args),
             # 任务过期时间，设置当前时间往后1天
             # expires=datetime.datetime.now() + datetime.timedelta(days=1),
-            expires=timezone.now() + datetime.timedelta(days=1),
+            # expires=timezone.now() + datetime.timedelta(days=1),
         )
         if created:
             return Response(
                 {
-                    'code': 200,
+                    'data': [],
                     'status': status.HTTP_200_OK,
                     'message': 'create success'
                 }
@@ -281,8 +282,19 @@ class CreateTaskView(APIView):
         else:
             return Response(
                 {
-                    'code': 400,
+                    'data': [],
                     'status': status.HTTP_400_BAD_REQUEST,
                     'message': 'create fail'
                 }
             )
+
+
+"""
+相关表的说明
+django_celerybeat.models.ClockedSchedule#此模型存放已经关闭的任务
+django_celery_beat.models.CrontabSchedule # 与像在cron项领域的时间表分钟小时日的一周 DAY_OF_MONTH month_of_yeal
+django_celery_beat.models.IntervalSchedule #以特定间隔（例如，每5秒）运行的计划。
+django_celery_beat.models.PeriodicTask#此模型定义要运行的单个周期性任务。
+django_celery_beat.models.PeriodicTasks 此模型仅用作索引I以跟踪计划何时更改
+django_celery_beat.models.SolarSchedule #定制任务
+"""
