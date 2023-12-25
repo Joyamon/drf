@@ -1,4 +1,6 @@
-from django.http import Http404
+import datetime
+
+from django.http import Http404, JsonResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
@@ -115,6 +117,13 @@ class GroupView(APIView):
                      'message': 'Success'
                      }
                 )
+            elif not request.version:
+                return Response(
+                    {'data': [],
+                     'status': status.HTTP_400_BAD_REQUEST,
+                     'message': 'Version is not found'
+                     }
+                )
         except Group.DoesNotExist:
             return Response(
                 {'data': [],
@@ -195,3 +204,62 @@ class GroupView(APIView):
                  'message': 'Success'
                  }
             )
+
+
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import json
+from django.utils import timezone
+
+
+class CreateTaskView(APIView):
+    """创建任务视图"""
+
+    def post(self, request):
+        """创建任务 接口传参,示例
+        {
+           "task_name": "任务名称",
+           "arg1": "参数1",
+           "arg2": "参数2",
+           "task_cron": "*/2 * * * *"
+        }
+        """
+        task_name = request.data.get("task_name")
+        task_kwargs = {
+            "task_name": task_name,
+            "arg1": request.data.get("arg1"),
+            "arg2": request.data.get("arg2"),
+        }
+        # 定时任务规则
+        cron_value = request.data.get("task_cron")
+        cro_list = str(cron_value).split(' ')
+        if len(list(cro_list)) != 5:
+            return Response({"code": 3003, "msg": "task_cron 不合法"})
+        cron_time = {
+            'minute': cro_list[0],  # 每2分钟执行一次
+            'hour': cro_list[1],
+            'day_of_week': cro_list[2],
+            'day_of_month': cro_list[3],
+            'month_of_year': cro_list[4]
+        }
+        # 写入 schedule表
+        schedule = CrontabSchedule.objects.create(**cron_time)
+        # 任务和 schedule 关联
+        task_obj = PeriodicTask.objects.filter(name=task_name)
+        if task_obj:
+            return JsonResponse({"code": 3000, "msg": "task name exist"})
+
+        task_obj, created = PeriodicTask.objects.get_or_create(
+            name=task_name,  # 名称保持唯一
+            task="drfUser.tasks.run_test",  # 任务的注册路径
+            crontab=schedule,
+            enabled=True,  # 是否开启任务
+            # args=json.dumps(task_args),
+            kwargs=json.dumps(task_kwargs),
+            # 任务过期时间，设置当前时间往后1天
+            # expires=datetime.datetime.now() + datetime.timedelta(days=1),
+            expires=timezone.now() + datetime.timedelta(days=1),
+        )
+        if created:
+            return JsonResponse({"code": 0, "msg": "success"})
+        else:
+            return JsonResponse({"code": 111, "msg": "create failed"})

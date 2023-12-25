@@ -3,3 +3,8 @@
 *.idea
 *.__pycache__
 /venv/
+*.ipynb
+*.pyc
+*.pyi
+*.pyx
+*.pyd

@@ -69,3 +69,8 @@ def structure_params_data(response):
 
     params_temp["orderData[globalOrder]"] = "YA028-5085515-5469931"
     return params_temp
+
+cron_value = '49 15 * * *'
+cro_list = str(cron_value).split(' ')
+
+print(len(cro_list))
