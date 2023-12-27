@@ -110,7 +110,7 @@ TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -234,16 +234,21 @@ CACHES = {
         'CONNECTION_POOL_CLASS': 'redis.connection.BlockingConnectionPool',
     }
 }
-
+# celery相关配置
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+
 # celery 时区
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_BROKER_URL = f'{REDIS_URL}/0'  # Broker配置，使用Redis作为消息中间件(无密码)
+# CELERY_BROKER_URL = f'{REDIS_URL}/0'  # Broker配置，使用Redis作为消息中间件(无密码)
 # CELERY_BROKER_URL = 'redis://:@127.0.0.1:6379/10'  #lybbn 代表 账号（没有可省略）  {} 存放密码  127.0.0.1连接的 ip  6379端口  10 redis库
 # CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/11' # 把任务结果存在了Redis
 # celery结果存储到数据库中django-db
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'  # Backend数据库
+# CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'  # Backend数据库
 CELERY_RESULT_PERSISTENT = True
 CELERY_RESULT_EXTENDED = True
 DJANGO_CELERY_BEAT_TZ_AWARE = False

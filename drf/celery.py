@@ -20,7 +20,6 @@ platforms.C_FORCE_ROOT = True
 
 # 重写CustomScheduler 方法，改为东八区
 from celery.beat import Scheduler, ScheduleEntry, event_t
-from celery.utils.log import get_logger
 
 
 class CustomScheduler(Scheduler):

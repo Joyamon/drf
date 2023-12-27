@@ -1,5 +1,6 @@
 import datetime
 
+import pytz
 from django.http import Http404, JsonResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -224,77 +225,38 @@ class CreateTaskView(APIView):
         }
         """
         task_name = request.data.get("task_name")
-        task_kwargs = {
-            "task_name": task_name,
-        }
-        task_args = request.data.get('args')
-        # 定时任务规则
         cron_value = request.data.get("task_cron")
-        cro_list = str(cron_value).split(' ')
-        if len(list(cro_list)) != 5:
+        cron_list = str(cron_value).split(' ')
+
+        if len(cron_list) != 5:
             return Response(
                 {
                     'data': [],
                     'status': status.HTTP_400_BAD_REQUEST,
-                    'message': 'cron is not correct,example: */2 * * * *'
-                }
-            )
-        cron_time = {
-            'minute': cro_list[0],  # 每2分钟执行一次
-            'hour': cro_list[1],
-            'day_of_week': cro_list[2],
-            'day_of_month': cro_list[3],
-            'month_of_year': cro_list[4],
-
-        }
-        # 写入 schedule表
-        schedule = CrontabSchedule.objects.create(**cron_time)
-        # 任务和 schedule 关联
-        task_obj = PeriodicTask.objects.filter(name=task_name)
-        if task_obj:
-            return JsonResponse(
-                {
-                    'data': [],
-                    'status': status.HTTP_400_BAD_REQUEST,
-                    'message': 'task is exist'
+                    'message': 'cron is not correct, example: */2 * * * *'
                 }
             )
 
-        task_obj, created = PeriodicTask.objects.get_or_create(
-            name=task_name,  # 名称保持唯一
-            task="drfUser.tasks.run_test",  # 任务的注册路径
-            crontab=schedule,
-            enabled=True,  # 是否开启任务
-            kwargs=json.dumps(task_kwargs),
-            args=json.dumps(task_args),
-            # 任务过期时间，设置当前时间往后1天
-            # expires=datetime.datetime.now() + datetime.timedelta(days=1),
-            # expires=timezone.now() + datetime.timedelta(days=1),
+        # 创建或更新CrontabSchedule
+        schedule, _ = CrontabSchedule.objects.get_or_create(
+            minute=cron_list[0],
+            hour=cron_list[1],
+            day_of_week=cron_list[2],
+            day_of_month=cron_list[3],
+            month_of_year=cron_list[4],
+            timezone=pytz.timezone("Asia/Shanghai")
         )
-        if created:
-            return Response(
-                {
-                    'data': [],
-                    'status': status.HTTP_200_OK,
-                    'message': 'create success'
-                }
-            )
-        else:
-            return Response(
-                {
-                    'data': [],
-                    'status': status.HTTP_400_BAD_REQUEST,
-                    'message': 'create fail'
-                }
-            )
+        periodic_task = PeriodicTask.objects.create(
+            crontab=schedule,
+            name=task_name,
+            task='drfUser.tasks.run_test',
+        )
+        periodic_task.enabled = True
+        periodic_task.save()
 
-
-"""
-相关表的说明
-django_celerybeat.models.ClockedSchedule#此模型存放已经关闭的任务
-django_celery_beat.models.CrontabSchedule # 与像在cron项领域的时间表分钟小时日的一周 DAY_OF_MONTH month_of_yeal
-django_celery_beat.models.IntervalSchedule #以特定间隔（例如，每5秒）运行的计划。
-django_celery_beat.models.PeriodicTask#此模型定义要运行的单个周期性任务。
-django_celery_beat.models.PeriodicTasks 此模型仅用作索引I以跟踪计划何时更改
-django_celery_beat.models.SolarSchedule #定制任务
-"""
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success'
+            }
+        )
