@@ -140,7 +140,14 @@ REST_FRAMEWORK = {
 # logging相关配置信息
 ################################################################
 import os
-
+# 判断drf根目录下是否有logs文件夹，没有则创建
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+# 判断logs文件夹下是否有debug.log文件,没有则创建
+if not os.path.exists('logs/debug.log'):
+    open('logs/debug.log', 'w').close()
+if not os.path.exists('logs/run.log'):
+    open('logs/run.log', 'w').close()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,

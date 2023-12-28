@@ -8,3 +8,4 @@
 *.pyi
 *.pyx
 *.pyd
+db.sqlite3
