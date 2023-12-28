@@ -9,3 +9,6 @@
 *.pyx
 *.pyd
 db.sqlite3
+*.iml
+*.xml
+.idea
