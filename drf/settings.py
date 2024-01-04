@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-u*_^ql)6%v5j54gfeojh$#(hy^8lh-hl0y(m__5r&-uk^6@+u&'
-
+# token duration
+INVALID_TIME = 60 * 60 * 24
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -131,7 +132,7 @@ REST_FRAMEWORK = {
 
     'PAGE_SIZE': 100,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'drf.custom_authentication.CustomAuthentication',  # 添加自定义认证类
+        'drf.authentication.CustomAuthentication',  # 添加自定义认证类
 
     ],
     'VERSION_PARAM': 'version',  # 版本
@@ -140,6 +141,7 @@ REST_FRAMEWORK = {
 # logging相关配置信息
 ################################################################
 import os
+
 # 判断drf根目录下是否有logs文件夹，没有则创建
 if not os.path.exists('logs'):
     os.mkdir('logs')
@@ -246,7 +248,6 @@ CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
 
 # celery 时区
 CELERY_TIMEZONE = TIME_ZONE

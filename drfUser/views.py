@@ -3,9 +3,12 @@ import datetime
 import pytz
 from django.http import Http404, JsonResponse
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import Group, User
+
+from drf.authentication import CustomAuthentication
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
@@ -13,7 +16,8 @@ from rest_framework.versioning import QueryParameterVersioning
 
 
 class UserView(APIView):
-    versioning_class = QueryParameterVersioning  # 版本
+    versioning_class = QueryParameterVersioning  # 版本控制
+    authentication_classes = []
 
     def get(self, request):
         users = User.objects.all()
@@ -208,8 +212,6 @@ class GroupView(APIView):
 
 
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
-import json
-from django.utils import timezone
 
 
 class CreateTaskView(APIView):
