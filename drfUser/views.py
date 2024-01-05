@@ -22,6 +22,8 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.versioning import QueryParameterVersioning
 from django.core.cache import cache
 from drfUser.sign import login_sign
+from captcha.views import CaptchaStore, captcha_image
+import base64
 
 
 class UserView(APIView):
@@ -398,3 +400,19 @@ class LogoutView(APIView):
                     'data': []
                 }
             )
+
+
+class CaptchaView(APIView):
+    authentication_classes = []
+
+    def get(self, request):
+        hashkey = CaptchaStore.generate_key()
+        id = CaptchaStore.objects.filter(hashkey=hashkey).first().id
+        image = captcha_image(request, hashkey)
+        # 将图片转换为base64
+        image_base = base64.b64encode(image.content)
+        data = {
+            "key": id,
+            "image_base": "data:image/png;base64," + image_base.decode("utf-8"),
+        }
+        return Response(data=data)

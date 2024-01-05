@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_beat',
     'django_celery_results',
+    'captcha',
     'drfUser'
 ]
 
@@ -269,3 +270,22 @@ CELERY_TASK_TIME_LIMIT = 60 * 30 * 5  # 限制celery任务执行时间，# 单�
 CELERYD_MAX_TASKS_PER_CHILD = 100  # worker执行100个任务自动销毁，防止内存泄露
 CELERYD_TASK_SOFT_TIME_LIMIT = 6000  # 单个任务的运行时间不超过此值(秒)，否则会抛出(SoftTimeLimitExceeded)异常停止任务
 CELERY_DISABLE_RATE_LIMITS = True  # 即使任务设置了明确的速率限制，也禁用所有速率限制。
+
+
+# ================================================= #
+# **************** 验证码配置  ******************* #
+# ================================================= #
+# CAPTCHA_LETTER_ROTATION = None # 禁止字母旋转
+CAPTCHA_IMAGE_SIZE = (160, 60)  # 设置 captcha 图片大小
+CAPTCHA_LENGTH = 4  # 字符个数
+CAPTCHA_TIMEOUT = 1  # 超时(minutes)
+CAPTCHA_OUTPUT_FORMAT = "%(image)s %(text_field)s %(hidden_field)s "
+CAPTCHA_FONT_SIZE = 40  # 字体大小
+CAPTCHA_FOREGROUND_COLOR = "#00ff00"  # 前景色
+CAPTCHA_BACKGROUND_COLOR = "#0d0101"  # 背景色
+CAPTCHA_NOISE_FUNCTIONS = (
+    "captcha.helpers.noise_arcs",  # 线
+    "captcha.helpers.noise_dots",  # 点
+)
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 字母验证码
+# CAPTCHA_CHALLENGE_FUNCT = "captcha.helpers.math_challenge"  # 加减乘除验证码
