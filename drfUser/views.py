@@ -21,6 +21,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.versioning import QueryParameterVersioning
 from django.core.cache import cache
+from drfUser.sign import login_sign
 
 
 class UserView(APIView):
@@ -306,6 +307,7 @@ class LoginView(APIView):
                 }
             )
         User.objects.filter(id=user.id).update(last_login=timezone.now())  # 更新最后登录时间
+        login_sign.send(username=username)  # 发送登录信号
         return Response(
             {
                 'status': status.HTTP_200_OK,
@@ -379,11 +381,20 @@ class LogoutView(APIView):
 
     def post(self, request):
         # 清除token
-        cache.delete('token')
-        return Response(
-            {
-                'status': status.HTTP_200_OK,
-                'message': 'success',
-                'data': []
-            }
-        )
+        if cache.get('token'):
+            cache.delete('token')
+            return Response(
+                {
+                    'status': status.HTTP_200_OK,
+                    'message': 'success',
+                    'data': []
+                }
+            )
+        else:
+            return Response(
+                {
+                    'status': status.HTTP_404_NOT_FOUND,
+                    'message': 'User not found',
+                    'data': []
+                }
+            )
