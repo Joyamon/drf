@@ -9,10 +9,15 @@
     2.功能模块:
         a 用户:增删改查查crud
         b 分组:增删改查查crud
+        c 登录，登出，修改密码，初始化密码
+        d ...
+        e ...
     3.定时任务:django_celery_beat实现
     4.Authentication权限验证,使用pyjwt模块生成Token
     5.version 版本控制
     6.pagination分页
+    7.blinker 记录登录用户
+    
 
 #### 软件架构
 
