@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group, User
 
 from drf.authentication import CustomAuthentication
 from drf.token import generate_token
+from drfUser.convert import convert_to_pinyin
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
@@ -293,7 +294,6 @@ class LoginView(APIView):
 
                 }
             )
-        # token = PasswordResetTokenGenerator().make_token(user=user)
         token = generate_token(username)
         try:
             cache.set('token', token, 60 * 60 * 24)  # token存到redis
@@ -305,6 +305,7 @@ class LoginView(APIView):
 
                 }
             )
+        User.objects.filter(id=user.id).update(last_login=timezone.now())  # 更新最后登录时间
         return Response(
             {
                 'status': status.HTTP_200_OK,
@@ -313,5 +314,76 @@ class LoginView(APIView):
                     'username': username,
                     'token': token
                 }
+            }
+        )
+
+
+class ModifyPasswordView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        username = request.data.get('username')
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        # 通过username查询用户
+        user = User.objects.filter(username=username).first()
+        if not user or not check_password(old_password, user.password):
+            return Response(
+                {
+                    'status': status.HTTP_401_UNAUTHORIZED,
+                    'message': 'Incorrect username or password',
+
+                }
+            )
+        user.set_password(new_password)
+        user.save()
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success',
+                'data': []
+            }
+        )
+
+
+class ResetPasswordView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        username = request.data.get('username')
+        # 通过username查询用户
+        user = User.objects.filter(username=username).first()
+        if not user:
+            return Response(
+                {
+                    'status': status.HTTP_404_NOT_FOUND,
+                    'message': 'User not found',
+                    'data': []
+                }
+            )
+        username = convert_to_pinyin(username)
+        user.set_password(username)
+        user.save()
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': f'password initial success,your password is:{username}',
+                'data': []
+
+            }
+        )
+
+
+class LogoutView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        # 清除token
+        cache.delete('token')
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success',
+                'data': []
             }
         )

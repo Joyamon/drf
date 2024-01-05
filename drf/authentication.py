@@ -23,7 +23,7 @@ class CustomAuthentication(BaseAuthentication):
                 }
             )
         else:
-            return (token, None)
+            return token, None
 
     def authenticate_header(self, request):
         return 'Authentication Failed'
