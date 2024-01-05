@@ -14,6 +14,7 @@ from rest_framework import status
 from django.contrib.auth.models import Group, User
 
 from drf.authentication import CustomAuthentication
+from drf.token import generate_token
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
@@ -41,11 +42,8 @@ class UserView(APIView):
             password = make_password(request.data.get('password'))
             serializer.validated_data['password'] = password
             serializer.save()
-            # user = User.objects.get(username=request.data['username'])
-            # token = Token.objects.create(user=user)
             return Response(
                 {'data': serializer.data,
-                 # 'token': token.key,
                  'status': status.HTTP_200_OK,
                  'message': 'Success'
 
@@ -295,7 +293,8 @@ class LoginView(APIView):
 
                 }
             )
-        token = PasswordResetTokenGenerator().make_token(user=user)
+        # token = PasswordResetTokenGenerator().make_token(user=user)
+        token = generate_token(username)
         try:
             cache.set('token', token, 60 * 60 * 24)  # token存到redis
         except ObjectDoesNotExist:
