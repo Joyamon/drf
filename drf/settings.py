@@ -21,8 +21,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-u*_^ql)6%v5j54gfeojh$#(hy^8lh-hl0y(m__5r&-uk^6@+u&'
-# token duration
-INVALID_TIME = 60 * 60 * 24
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -37,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework.authtoken',
     'rest_framework',
     'django_celery_beat',
     'django_celery_results'

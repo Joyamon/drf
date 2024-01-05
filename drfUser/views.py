@@ -1,7 +1,12 @@
 import datetime
-
+import json
+from django.contrib.auth.hashers import make_password, check_password
 import pytz
+from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, JsonResponse
+from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import authentication_classes
 from rest_framework.response import Response
@@ -13,6 +18,7 @@ from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password
 from rest_framework.versioning import QueryParameterVersioning
+from django.core.cache import cache
 
 
 class UserView(APIView):
@@ -35,11 +41,11 @@ class UserView(APIView):
             password = make_password(request.data.get('password'))
             serializer.validated_data['password'] = password
             serializer.save()
-            user = User.objects.get(username=request.data['username'])
-            token = Token.objects.create(user=user)
+            # user = User.objects.get(username=request.data['username'])
+            # token = Token.objects.create(user=user)
             return Response(
                 {'data': serializer.data,
-                 'token': token.key,
+                 # 'token': token.key,
                  'status': status.HTTP_200_OK,
                  'message': 'Success'
 
@@ -269,5 +275,44 @@ class CreateTaskView(APIView):
             {
                 'status': status.HTTP_200_OK,
                 'message': 'success'
+            }
+        )
+
+
+class LoginView(APIView):
+    authentication_classes = []
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        # 通过username查询用户
+        user = User.objects.filter(username=username).first()
+        if not user or not check_password(password, user.password):
+            return Response(
+                {
+                    'status': status.HTTP_401_UNAUTHORIZED,
+                    'message': 'Incorrect username or password',
+
+                }
+            )
+        token = PasswordResetTokenGenerator().make_token(user=user)
+        try:
+            cache.set('token', token, 60 * 60 * 24)  # token存到redis
+        except ObjectDoesNotExist:
+            return Response(
+                {
+                    'status': status.HTTP_404_NOT_FOUND,
+                    'message': 'User not found',
+
+                }
+            )
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success',
+                'data': {
+                    'username': username,
+                    'token': token
+                }
             }
         )
