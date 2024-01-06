@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import pytz
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,8 +80,14 @@ WSGI_APPLICATION = 'drf.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': 'drf',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': 'localhost',
+        'PORT': '3306',
+
     }
 }
 
@@ -109,7 +117,7 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
@@ -218,13 +226,6 @@ LOGGING = {
         }
     }
 }
-################################################################
-# redis 相关配置
-################################################################
-REDIS_PASSWORD = ''
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = '6379'
-REDIS_URL = f'redis://:{REDIS_PASSWORD or ""}@{REDIS_HOST}:{REDIS_PORT}'
 
 ################################################################
 # celery 相关配置
@@ -233,7 +234,7 @@ REDIS_URL = f'redis://:{REDIS_PASSWORD or ""}@{REDIS_HOST}:{REDIS_PORT}'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'{REDIS_URL}/1',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'CONNECTION_POOL_KWARGS': {'socket_timeout': 5},  # 连接redis超时时间，单位为秒
@@ -242,39 +243,12 @@ CACHES = {
         'CONNECTION_POOL_CLASS': 'redis.connection.BlockingConnectionPool',
     }
 }
-# celery相关配置
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-
-# celery 时区
-CELERY_TIMEZONE = TIME_ZONE
-# CELERY_BROKER_URL = f'{REDIS_URL}/0'  # Broker配置，使用Redis作为消息中间件(无密码)
-# CELERY_BROKER_URL = 'redis://:@127.0.0.1:6379/10'  #lybbn 代表 账号（没有可省略）  {} 存放密码  127.0.0.1连接的 ip  6379端口  10 redis库
-# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/11' # 把任务结果存在了Redis
-# celery结果存储到数据库中django-db
-# CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'  # Backend数据库
-CELERY_RESULT_PERSISTENT = True
-CELERY_RESULT_EXTENDED = True
-DJANGO_CELERY_BEAT_TZ_AWARE = False
-CELERY_ENABLE_UTC = False
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 连接超时
-CELERY_TASK_SERIALIZER = 'json'  # 任务序列化和反序列化使json
-CELERY_RESULT_SERIALIZER = 'json'
-# CELERYD_CONCURRENCY = 2  #并发worker数量
-CELERY_WORKER_CONCURRENCY = 2  # 并发数
-CELERYD_FORCE_EXECV = True  # 防止死锁,应确保为True
-CELERY_TASK_TIME_LIMIT = 60 * 30 * 5  # 限制celery任务执行时间，# 单个任务的运行时间限制，否则会被杀死
-CELERYD_MAX_TASKS_PER_CHILD = 100  # worker执行100个任务自动销毁，防止内存泄露
-CELERYD_TASK_SOFT_TIME_LIMIT = 6000  # 单个任务的运行时间不超过此值(秒)，否则会抛出(SoftTimeLimitExceeded)异常停止任务
-CELERY_DISABLE_RATE_LIMITS = True  # 即使任务设置了明确的速率限制，也禁用所有速率限制。
 
 
-# ================================================= #
-# **************** 验证码配置  ******************* #
-# ================================================= #
+
+################################################################
+# 验证码配置
+################################################################
 # CAPTCHA_LETTER_ROTATION = None # 禁止字母旋转
 CAPTCHA_IMAGE_SIZE = (160, 60)  # 设置 captcha 图片大小
 CAPTCHA_LENGTH = 4  # 字符个数

@@ -224,6 +224,7 @@ from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 class CreateTaskView(APIView):
     """创建任务视图"""
+    authentication_classes = []
 
     def post(self, request):
         """创建任务 接口传参,示例
@@ -254,7 +255,7 @@ class CreateTaskView(APIView):
             day_of_week=cron_list[2],
             day_of_month=cron_list[3],
             month_of_year=cron_list[4],
-            timezone=pytz.timezone("Asia/Shanghai")
+            timezone=pytz.timezone("Asia/Shanghai"),
         )
         if PeriodicTask.objects.filter(name=task_name).exists():
             return Response(
