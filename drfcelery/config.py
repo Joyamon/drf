@@ -15,7 +15,7 @@ from .main import app
 app.conf.beat_schedule = {
     'schedule_test': {
         'task': 'drfcelery.drf_task.tasks.run_test',
-        'schedule': crontab(minute='17', hour='18'),
+        'schedule': crontab(minute='52', hour='10'),
     },
 
 }

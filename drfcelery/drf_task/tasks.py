@@ -1,6 +1,3 @@
-# import django
-#
-# django.setup()  # 必须先启动django项目
 from celery import shared_task
 
 
