@@ -26,5 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view),
     path('user/', include(('drfUser.urls', 'drfUser'), namespace='drfUser')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('pic/',include(('photo.urls', 'photo'), namespace='photo'))
 ]

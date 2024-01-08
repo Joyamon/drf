@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'captcha',
     'drfUser',
-    'rest_framework_swagger'
+    'rest_framework_swagger',
+    'photo',
 ]
 
 MIDDLEWARE = [
@@ -261,3 +262,10 @@ CAPTCHA_NOISE_FUNCTIONS = (
 )
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 字母验证码
 # CAPTCHA_CHALLENGE_FUNCT = "captcha.helpers.math_challenge"  # 加减乘除验证码
+
+################################################################
+# 上传图片配置
+################################################################
+# 指定上传文件保存的目录
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
