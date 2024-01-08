@@ -16,13 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
-
-
-
-
+from rest_framework.schemas import get_schema_view
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
+schema_view = get_schema_view(
+    title='Example API',
+    renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer]
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view),
     path('user/', include(('drfUser.urls', 'drfUser'), namespace='drfUser')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

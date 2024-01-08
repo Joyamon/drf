@@ -14,7 +14,6 @@ from pathlib import Path
 import pytz
 from celery.schedules import crontab
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,7 +40,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'captcha',
-    'drfUser'
+    'drfUser',
+    'rest_framework_swagger'
 ]
 
 MIDDLEWARE = [
@@ -243,8 +243,6 @@ CACHES = {
         'CONNECTION_POOL_CLASS': 'redis.connection.BlockingConnectionPool',
     }
 }
-
-
 
 ################################################################
 # 验证码配置

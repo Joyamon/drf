@@ -15,6 +15,7 @@ urlpatterns = [
     path('modpwd/', views.ModifyPasswordView.as_view()),
     path('resetpwd/', views.ResetPasswordView.as_view()),
     path("captcha/", views.CaptchaView.as_view()),
+    path('apsscheduler/',views.APSSchedulerView.as_view())
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

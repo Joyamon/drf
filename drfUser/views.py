@@ -417,3 +417,27 @@ class CaptchaView(APIView):
             "image_base": "data:image/png;base64," + image_base.decode("utf-8"),
         }
         return Response(data=data)
+
+
+from datetime import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+
+class APSSchedulerView(APIView):
+    authentication_classes = []
+
+    @staticmethod
+    def tick():
+        print('定时任务开始执行! The time is: %s' % datetime.now())
+
+    def post(self, request):
+        hour = int(request.data.get('hour'))
+        minute = int(request.data.get('minute'))
+        scheduler = BlockingScheduler()
+        scheduler.add_job(self.tick, 'cron', hour=hour, minute=minute)
+        try:
+            scheduler.start()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+
+        return Response(data={'message': '定时任务添加成功！'})

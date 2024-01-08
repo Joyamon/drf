@@ -18,6 +18,10 @@
     6.pagination分页
     7.blinker 记录登录用户日志
     8.django-simple-captcha实现图片验证码
+    9.pypinyin实现汉字转拼音，例如:张三 >>>  zhangsan
+    10.APScheduler实现定时任务
+    11.celery实现定时任务
+
     
 
 #### 软件架构
