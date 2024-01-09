@@ -21,6 +21,7 @@
     9.pypinyin实现汉字转拼音，例如:张三 >>>  zhangsan
     10.APScheduler实现定时任务
     11.celery实现定时任务
+    12.drf-yasg实现接口文档
 
     
 
@@ -56,6 +57,9 @@
 3. 提交代码
 4. 新建 Pull Request
 
+#### swagger集成效果图
+![图片描述](swagger.png)
+![图片描述](swagger_user.png)
 #### 特技
 
 1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md

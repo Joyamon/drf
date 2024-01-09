@@ -35,14 +35,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
+    'drf_yasg',
     'rest_framework',
     'django_celery_beat',
     'django_celery_results',
     'captcha',
     'drfUser',
-    'rest_framework_swagger',
     'photo',
+
 ]
 
 MIDDLEWARE = [
@@ -139,10 +140,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'drf.pagination.CustomPagination',
 
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'drf.authentication.CustomAuthentication',  # 添加自定义认证类
-
-    ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'drf.authentication.CustomAuthentication',  # 添加自定义认证类
+    #
+    # ],
     'VERSION_PARAM': 'version',  # 版本
 }
 ################################################################
@@ -269,3 +270,32 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 字母验�
 # 指定上传文件保存的目录
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# ====================================#
+# ****************swagger************#
+# ====================================#
+SWAGGER_SETTINGS = {
+    # 基础样式
+    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+    # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
+    "LOGIN_URL": "apiLogin/",
+    # 'LOGIN_URL': 'rest_framework:login',
+    "LOGOUT_URL": "rest_framework:logout",
+    # 'DOC_EXPANSION': None,
+    'SHOW_REQUEST_HEADERS': True,
+    'USE_SESSION_AUTH': True,
+    'DOC_EXPANSION': 'list',
+    # 接口文档中方法列表以首字母升序排列
+    "APIS_SORTER": "alpha",
+    # 如果支持json提交, 则接口文档中包含json输入框
+    "JSON_EDITOR": True,
+    # 方法列表字母排序
+    "OPERATIONS_SORTER": "alpha",
+    "VALIDATOR_URL": None,
+    "AUTO_SCHEMA_TYPE": 2,  # 分组根据url层级分，0、1 或 2 层
+    "DEFAULT_AUTO_SCHEMA_CLASS": "drf.swagger.CustomSwaggerAutoSchema",
+    # 接口文档中支持输入Parameters
+    "ALLOW_PARAMETER_TO_SCHEMA": True,
+    # 接口文档中方法的注解来源, 包括: 'path' (path注解), 'query' (query注解), 'body' (body注解)
+
+}

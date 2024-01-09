@@ -7,8 +7,9 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, JsonResponse
 from django.utils import timezone
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import authentication_classes
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import authentication_classes, api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import Group, User
@@ -18,6 +19,7 @@ from drf.token import generate_token
 from drfUser.convert import convert_to_pinyin
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from django.contrib.auth.hashers import make_password
 from rest_framework.versioning import QueryParameterVersioning
 from django.core.cache import cache
@@ -31,6 +33,11 @@ class UserView(APIView):
     authentication_classes = []
 
     def get(self, request):
+        """
+        获取所有用户
+        :param request:
+        :return:
+        """
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(
@@ -40,6 +47,19 @@ class UserView(APIView):
              }
         )
 
+    @swagger_auto_schema(
+        method='post',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='string')
+            }
+        ),
+        responses={200: openapi.Response('Success', UserSerializer), 400: 'Bad Request'}
+    )
+    @action(methods=['post'], detail=False)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
