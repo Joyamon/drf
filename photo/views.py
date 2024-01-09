@@ -1,9 +1,10 @@
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
+import os
+from drf.settings import MEDIA_ROOT
 from .serializers import ImageSerializer
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from photo.models import Image
 
 
@@ -21,10 +22,40 @@ class UploadImageView(APIView):
             return Response(file_serializer.errors, status=400)
 
 
-class DownloadImageView(APIView):
+class CatImageView(APIView):
     authentication_classes = []
 
     def get(self, request, image_id):
-        image = get_object_or_404(Image, id=image_id)
-        file_path = image.image.path
-        return FileResponse(open(file_path, 'rb'))
+        try:
+            image = Image.objects.get(id=image_id)
+        except Image.DoesNotExist:
+            return Response(status=404)
+
+        image_path = image.image.path
+        image_name = image.name
+        response = FileResponse(open(image_path, 'rb'))
+        response['Content-Disposition'] = f'attachment; filename="{image_name}"'
+        return response
+
+
+class DownloadImageView(APIView):
+    def get(self, request, image_id):
+        try:
+            image = Image.objects.get(id=image_id)
+        except Image.DoesNotExist:
+            return Response(status=404)
+
+        image_path = image.image.path
+        image_name = image.name
+        file_extension = '.png'  # 文件扩展名
+
+        with open(image_path, 'rb') as file:
+            image_data = file.read()
+
+        # 保存文件到本地
+
+        file_path = os.path.join(image_name + file_extension)
+        with open(file_path, 'wb') as file:
+            file.write(image_data)
+
+        return Response({'file_path': file_path})
