@@ -1,7 +1,6 @@
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 import os
-from drf.settings import MEDIA_ROOT
 from .serializers import ImageSerializer
 from rest_framework.views import APIView
 from django.http import FileResponse, HttpResponse
@@ -51,11 +50,9 @@ class DownloadImageView(APIView):
 
         with open(image_path, 'rb') as file:
             image_data = file.read()
-
         # 保存文件到本地
-
         file_path = os.path.join(image_name + file_extension)
-        with open(file_path, 'wb') as file:
-            file.write(image_data)
-
-        return Response({'file_path': file_path})
+        with open(image_path, 'rb') as file:
+            with open(file_path, 'wb') as outfile:
+                outfile.write(file.read())
+        return FileResponse(open(file_path, 'rb'), as_attachment=True)
