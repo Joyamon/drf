@@ -19,6 +19,7 @@ urlpatterns = [
     path('resetpwd/', views.ResetPasswordView.as_view()),
     path("captcha/", views.CaptchaView.as_view()),
     path('apsscheduler/', views.APSSchedulerView.as_view()),
+    path('ip/', views.IpView.as_view())
 
 
 ]

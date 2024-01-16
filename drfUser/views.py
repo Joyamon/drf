@@ -1,11 +1,8 @@
 import datetime
-import json
 from django.contrib.auth.hashers import make_password, check_password
 import pytz
-from django.contrib.auth import authenticate
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -13,9 +10,8 @@ from rest_framework.decorators import authentication_classes, api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import Group, User
-
-from drf.authentication import CustomAuthentication
 from drf.token import generate_token
+from drf.utils import validate_ip
 from drfUser.convert import convert_to_pinyin
 from drfUser.serializers import UserSerializer, GroupSerializer
 from rest_framework.views import APIView
@@ -461,3 +457,82 @@ class APSSchedulerView(APIView):
             raise
 
         return Response(data={'message': '定时任务添加成功！'})
+
+
+from django.contrib.gis.geoip2 import GeoIP2
+import geoip2
+from urllib.parse import urlparse
+
+
+class IpView(APIView):
+    authentication_classes = []
+
+    def details(self, ip):
+        g = GeoIP2()
+        details = g.city(ip)
+        return details
+
+    def get(self, request):
+        try:
+            ip = request.data.get('ip')
+            is_ip = ip.replace('.', '')
+            if not ip:
+                return Response(data={'message': 'please input ip first'})
+
+            elif is_ip.isdigit():
+                if not validate_ip(ip):
+                    details = 'address is not valid'
+                    return Response(
+                        {
+                            'data': {
+                                'details': details
+                            },
+                            'success': True,
+                            'message': 'Success'
+                        }
+                    )
+                else:
+                    details = self.details(ip)
+                    return Response(
+                        {
+                            'data': {
+                                'details': details
+                            },
+                            'success': True,
+                            'message': 'Success'
+                        }
+                    )
+            elif 'http' in ip or 'https' in ip:
+                ip = urlparse(ip).netloc
+                details = self.details(ip)
+                return Response(
+                    {
+                        'data': {
+                            'details': details
+                        },
+                        'success': True,
+                        'message': 'Success'
+                    }
+                )
+            else:
+                details = self.details(ip)
+                return Response(
+                    {
+                        'data': {
+                            'details': details
+                        },
+                        'success': True,
+                        'message': 'Success'
+                    }
+                )
+        except geoip2.errors.AddressNotFoundError:
+            details = f'The {ip} address could not be found.'
+            return Response(
+                {
+                    'data': {
+                        'details': details
+                    },
+                    'success': True,
+                    'message': 'Success'
+                }
+            )

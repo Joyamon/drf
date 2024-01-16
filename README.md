@@ -22,6 +22,7 @@
     10.APScheduler实现定时任务
     11.celery实现定时任务
     12.drf-yasg实现接口文档
+    13.geoip2实现IP地址定位
 
     
 
@@ -60,6 +61,8 @@
 #### swagger集成效果图
 ![图片描述](swagger.png)
 ![图片描述](swagger_user.png)
+#### geoip2获取IP地址信息
+![图片描述](ip.png)
 #### 特技
 
 1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'captcha',
     'drfUser',
     'photo',
+    'geoip2',
 
 ]
 
@@ -61,8 +62,7 @@ ROOT_URLCONF = 'drf.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -299,3 +299,10 @@ SWAGGER_SETTINGS = {
     # 接口文档中方法的注解来源, 包括: 'path' (path注解), 'query' (query注解), 'body' (body注解)
 
 }
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+
+GEOIP_PATH = os.path.join(BASE_DIR, 'GeoLite2-City.mmdb')
