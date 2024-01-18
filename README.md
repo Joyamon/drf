@@ -2,9 +2,9 @@
 
 #### 介绍
 
-纯后端项目，会前端技术的小伙伴欢迎加入。
-项目持续更新中...
-
+前后端分离项目，后端使用django+drf框架，前端使用layui框架.
+自学layui框架，项目持续更新中...
+#### 后端
     1.使用django，drf框架
     2.功能模块:
         a 用户:增删改查查crud
@@ -24,6 +24,8 @@
     12.drf-yasg实现接口文档
     13.geoip2实现IP地址定位
 
+#### 前端
+    1.使用layui框架
     
 
 #### 软件架构
@@ -45,10 +47,7 @@
    * 启动beat服务:celery -A  drfcelery.main beat --loglevel=info >logs/celerybeat.log
 
 
-#### 使用说明
 
-1. 纯后台项目，使用postman等工具代理发送请求
-2. ...
 
 
 #### 参与贡献
