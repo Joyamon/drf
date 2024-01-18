@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import pytz
 from celery.schedules import crontab
+import corsheaders
+from corsheaders.middleware import CorsMiddleware
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cors_middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'drf.urls'
@@ -304,5 +308,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-
+# GeoLite2-City.mmdb数据库配置
 GEOIP_PATH = os.path.join(BASE_DIR, 'GeoLite2-City.mmdb')

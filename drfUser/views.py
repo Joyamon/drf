@@ -22,11 +22,13 @@ from django.core.cache import cache
 from drfUser.sign import login_sign
 from captcha.views import CaptchaStore, captcha_image
 import base64
+from rest_framework.pagination import PageNumberPagination
 
 
 class UserView(APIView):
     versioning_class = QueryParameterVersioning  # 版本控制
     authentication_classes = []
+    ordering = ('id',)
 
     def get(self, request):
         """
@@ -34,13 +36,22 @@ class UserView(APIView):
         :param request:
         :return:
         """
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
+        users = User.objects.all().order_by(*self.ordering)
+        page = PageNumberPagination()  # 产生一个分页器对象
+        page.page_size = 4  # 默认每页显示的多少条记录
+        page.page_query_param = 'page'  # 默认查询参数名为 page
+        page.page_size_query_param = 'size'  # 前台控制每页显示的最大条数
+        page.max_page_size = 10  # 后台控制显示的最大记录条数，防止用户输入的查询条数过大
+        ret = page.paginate_queryset(users, request)
+        serializer = UserSerializer(ret, many=True)
         return Response(
-            {'data': serializer.data,
-             'status': status.HTTP_200_OK,
-             'message': 'Success',
-             }
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'Success',
+                'page': page.get_paginated_response(serializer.data).data,
+                'size': page.page_size,
+
+            }
         )
 
     @swagger_auto_schema(
