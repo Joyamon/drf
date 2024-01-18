@@ -3,30 +3,48 @@
 <head>
   <meta charset="utf-8">
   <title>用户</title>
+  <meta http-equiv="Access-Control-Allow-Origin" content="*">
   <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
 </head>
 <body>
+
+	<ul class="layui-nav">
+		<li class="layui-nav-item"><a href="#">首页</a></li>
+		<li class="layui-nav-item"><a href="#">产品展示</a></li>
+		<li class="layui-nav-item"><a href="#">大数据</a></li>
+		<li class="layui-nav-item"><a href="#">微博</a></li>
+	</ul>
+	<span class="layui-breadcrumb" lay-separator="|">
+		<a href="#">首页</a>
+		<a href="#">产品展示</a>
+		<a href="#">大数据</a>
+		<a href="#">微博</a>
+
+	</span>
 	<div class="layui-container">
 		<div class="layui-row">
 			<div class="layui-col-md6 layui-col-md-offset3">
 					<table id="showuser" ></table>
-				
-			</div>
-			
-		</div>
-		
-	</div>
- 
 
- 
+			</div>
+
+		</div>
+
+	</div>
+
+
+
 <script src="../../static/layui/layui.js"></script>
+<!--表单-->
 <script>
 layui.use('table', function(){
   var table = layui.table;
-  
+
   table.render({
     elem: '#showuser',
-    height: 312,
+//  height: 312,
+		even:true,
+		size:'lg',
     url: 'http://127.0.0.1:8000/user/user/',//数据接口
     parseData: function(res){ //res 即为原始返回的数据
     return {
@@ -36,22 +54,31 @@ layui.use('table', function(){
       "data": res.page.results //解析数据列表
     };
   },
-    page: true, //开启分页
+    page: false, //开启分页
     cols: [[ //表头
-      {field: 'id', title: 'ID', width:80, sort: true},
-      {field: 'username', title: '用户名', width:100,sort: true},
-      {field: 'email', title: '邮箱', width:180, sort: true },
-      {field: 'is_superuser', title: '是否管理员', width:80,sort: true, templet: function(d){if(d.sex == 1){return '是'}else{return '否'}}} ,
-      {field: 'date_joined', title: '注册时间', width: 177,sort: true, templet: "<div>{{layui.util.toDateString(d.date_joined, 'yyyy年MM月dd日')}}</div>"},
-      
+      {field: 'id', title: 'ID', sort: true,width:'80'},
+      {field: 'username', title: '用户名',sort: true,width:'100'},
+      {field: 'email', title: '邮箱', sort: true,width:'150'},
+      {field: 'is_superuser', title: '是否管理员', sort: true,width:'80',templet: function(d){if(d.sex == 1){return '是'}else{return '否'}}} ,
+      {field: 'date_joined', title: '注册时间', sort: true, width:'200',templet: "<div>{{layui.util.toDateString(d.date_joined, 'yyyy年MM月dd日')}}</div>"},
+
     ]],
+
     request: {
     		pageName: 'page', //页码的参数名称，默认：page
     		limitName: 'size' //每页数据量的参数名，默认：limit
   }
   });
-  
+
 });
+</script>
+<!--导航-->
+<script>
+	layui.use(['element'],function(){
+		var element = layui.element;
+
+	});
+
 </script>
 </body>
 </html>
