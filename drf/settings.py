@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',  # 视频在模版中显示
             ],
         },
     },
@@ -310,3 +311,41 @@ STATICFILES_DIRS = [
 
 # GeoLite2-City.mmdb数据库配置
 GEOIP_PATH = os.path.join(BASE_DIR, 'GeoLite2-City.mmdb')
+
+
+# celery配置
+
+
+
+# 设置消息broker，格式为：db://user:password@host:port/dbname
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/5" # BROKERD配置，这里使用redis的0号库来存
+
+# celery时区设置，建议与Django settings中TIME_ZONE同样时区，防止时差
+CELERY_TIMEZONE = TIME_ZONE
+
+# 为django_celery_results存储Celery任务执行结果，格式为：db+scheme://user:password@host:port/dbname
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/6"  # BACKEND配置，这里使用redis的1号库来存
+
+# celery内容等消息的格式设置，默认json
+CELERY_ACCEPT_CONTENT = ['application/json', ]
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# 连接超时
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 3600秒
+
+# 为任务设置超时时间，单位秒。超时即中止，执行下个任务。
+CELERY_TASK_TIME_LIMIT = 5
+
+# 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
+# 设为0，存储结果永不过期
+CELERY_RESULT_EXPIRES = 0
+
+# 任务限流
+CELERY_TASK_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
+
+# Worker并发数量，一般默认CPU核数，可以不设置
+CELERY_WORKER_CONCURRENCY = 2
+
+# 每个worker执行了多少任务就会死掉，默认是无限的
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
