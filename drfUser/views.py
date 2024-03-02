@@ -283,6 +283,7 @@ class CreateTaskView(APIView):
             month_of_year=cron_list[4],
             timezone=pytz.timezone("Asia/Shanghai"),
         )
+
         if PeriodicTask.objects.filter(name=task_name).exists():
             return Response(
                 {
@@ -291,11 +292,14 @@ class CreateTaskView(APIView):
                     'message': 'task name already exists'
                 }
             )
+
         periodic_task = PeriodicTask.objects.create(
             crontab=schedule,
             name=task_name,
-            task='drfUser.tasks.run_test',
+            task='drfUser.tasks.run_test_task',
         )
+
+
 
         periodic_task.enabled = True
         periodic_task.save()

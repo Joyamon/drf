@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import pytz
 from celery.schedules import crontab
 import corsheaders
 from corsheaders.middleware import CorsMiddleware
@@ -119,9 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
+LANGUAGE_CODE = 'zh-Hans'
 TIME_ZONE = 'Asia/Shanghai'
+
 
 USE_I18N = True
 USE_L10N = True
@@ -312,40 +311,35 @@ STATICFILES_DIRS = [
 # GeoLite2-City.mmdb数据库配置
 GEOIP_PATH = os.path.join(BASE_DIR, 'GeoLite2-City.mmdb')
 
-
 # celery配置
 
-
-
-# 设置消息broker，格式为：db://user:password@host:port/dbname
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/5" # BROKERD配置，这里使用redis的0号库来存
-
-# celery时区设置，建议与Django settings中TIME_ZONE同样时区，防止时差
+# celery beat配置
+CELERY_ENABLE_UTC = False
 CELERY_TIMEZONE = TIME_ZONE
-
-# 为django_celery_results存储Celery任务执行结果，格式为：db+scheme://user:password@host:port/dbname
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/6"  # BACKEND配置，这里使用redis的1号库来存
+DJANGO_CELERY_BEAT_TZ_AWARE = False
+# celery 的启动工作数量设置
+CELERY_WORKER_CONCURRENCY = 1
+# 任务预取功能，会尽量多拿 n 个，以保证获取的通讯成本可以压缩。
+CELERYD_PREFETCH_MULTIPLIER = 20
+# 有些情况下可以防止死锁
+CELERYD_FORCE_EXECV = True
+# celery 的 worker 执行多少个任务后进行重启操作
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
+# 禁用所有速度限制，如果网络资源有限，不建议开足马力。
+CELERY_DISABLE_RATE_LIMITS = True
+# 设置代理人broker
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
+# 指定 Backend
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # celery内容等消息的格式设置，默认json
 CELERY_ACCEPT_CONTENT = ['application/json', ]
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-
-# 连接超时
-CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}  # 3600秒
-
-# 为任务设置超时时间，单位秒。超时即中止，执行下个任务。
-CELERY_TASK_TIME_LIMIT = 5
-
-# 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
-# 设为0，存储结果永不过期
-CELERY_RESULT_EXPIRES = 0
-
-# 任务限流
-CELERY_TASK_ANNOTATIONS = {'tasks.add': {'rate_limit': '10/s'}}
-
-# Worker并发数量，一般默认CPU核数，可以不设置
-CELERY_WORKER_CONCURRENCY = 2
-
-# 每个worker执行了多少任务就会死掉，默认是无限的
-CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "drfUser.tasks.run_test_task",
+        "schedule": crontab(hour='17', minute="32"),
+    }
+}
