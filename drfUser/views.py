@@ -281,7 +281,7 @@ class CreateTaskView(APIView):
             day_of_week=cron_list[2],
             day_of_month=cron_list[3],
             month_of_year=cron_list[4],
-            timezone=pytz.timezone("Asia/Shanghai"),
+            # timezone=pytz.timezone("Asia/Shanghai"),
         )
 
         if PeriodicTask.objects.filter(name=task_name).exists():
@@ -298,8 +298,6 @@ class CreateTaskView(APIView):
             name=task_name,
             task='drfUser.tasks.run_test_task',
         )
-
-
 
         periodic_task.enabled = True
         periodic_task.save()

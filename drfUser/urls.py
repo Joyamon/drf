@@ -2,9 +2,6 @@ from django.urls import path, re_path
 from rest_framework.urlpatterns import format_suffix_patterns
 from drfUser import views
 
-
-
-
 urlpatterns = [
     # user增删改查查，使用两个CBV
     path('user/', views.UserView.as_view()),
@@ -20,6 +17,5 @@ urlpatterns = [
     path("captcha/", views.CaptchaView.as_view()),
     path('apsscheduler/', views.APSSchedulerView.as_view()),
     path('ip/', views.IpView.as_view())
-
 
 ]

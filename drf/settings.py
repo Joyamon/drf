@@ -312,34 +312,18 @@ STATICFILES_DIRS = [
 GEOIP_PATH = os.path.join(BASE_DIR, 'GeoLite2-City.mmdb')
 
 # celery配置
-
-# celery beat配置
-CELERY_ENABLE_UTC = False
-CELERY_TIMEZONE = TIME_ZONE
 DJANGO_CELERY_BEAT_TZ_AWARE = False
-# celery 的启动工作数量设置
-CELERY_WORKER_CONCURRENCY = 1
-# 任务预取功能，会尽量多拿 n 个，以保证获取的通讯成本可以压缩。
-CELERYD_PREFETCH_MULTIPLIER = 20
-# 有些情况下可以防止死锁
-CELERYD_FORCE_EXECV = True
-# celery 的 worker 执行多少个任务后进行重启操作
-CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
-# 禁用所有速度限制，如果网络资源有限，不建议开足马力。
-CELERY_DISABLE_RATE_LIMITS = True
-# 设置代理人broker
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
-# 指定 Backend
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-# celery内容等消息的格式设置，默认json
-CELERY_ACCEPT_CONTENT = ['application/json', ]
+CELERY_ENABLE_UTC = False
+CELERY_BROKER_URL = 'redis://localhost:6379/5'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/6'
+CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Shanghai'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "drfUser.tasks.run_test_task",
-        "schedule": crontab(hour='17', minute="32"),
+        "schedule": crontab(hour='15', minute="01"),
     }
 }
