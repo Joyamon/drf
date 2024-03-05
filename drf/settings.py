@@ -324,6 +324,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "drfUser.tasks.run_test_task",
-        "schedule": crontab(hour='15', minute="01"),
+        "schedule": crontab(hour='18', minute="10"),
     }
 }
