@@ -322,43 +322,48 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-#
-# CELERY_TASK_ROUTES = {
-#     "drfUser.tasks.run_router_one": {'queue': 'router_one'},
-#     "drfUser.tasks.run_router_two": {'queue': 'router_two'},
-# }
-# CELERY_TASK_DEFAULT_QUEUE = 'default'
-# CELERY_TASK_QUEUES = (
-#     Queue('default', routing_key='default'),
-#     Queue('router_one', routing_key='router_one'),
-#     Queue('router_two', routing_key='router_two'),
-# )
-# CELERY_TASK_DEFAULT_EXCHANGE = 'tasks'
-# CELERY_TASK_DEFAULT_EXCHANGE_TYPE = 'topic'
-# CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
-# 增加任务队列
+# router配置
+CELERY_TASK_ROUTES = {
+    "drfUser.tasks.run_router_one": {'queue': 'router_one'},
+    "drfUser.tasks.run_router_two": {'queue': 'router_two'},
+}
+# 默认队列
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+# 队列路由规则
+CELERY_TASK_QUEUES = (
+    Queue('default', routing_key='default'),
+    Queue('router_one', routing_key='router_one'),
+    Queue('router_two', routing_key='router_two'),
+)
+# 默认交换机
+CELERY_TASK_DEFAULT_EXCHANGE = 'tasks'
+# 默认交换机类型
+CELERY_TASK_DEFAULT_EXCHANGE_TYPE = 'topic'
+# 默认路由键
+CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
+# 定时任务配置
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "drfUser.tasks.run_test_task",
         "schedule": crontab(hour='18', minute="10"),
-        "options": {
-            "queue": "default"
-        }
+        # "options": {
+        #     "queue": "default"
+        # }
     },
     "test_task1": {
         "task": "drfUser.tasks.run_router_one",
         "schedule": timedelta(seconds=5),
-        "options": {
-            "queue": "router_one"
-        }
+        # "options": {
+        #     "queue": "router_one"
+        # }
 
     },
     "test_task2": {
         "task": "drfUser.tasks.run_router_two",
         "schedule": timedelta(seconds=10),
-        "options": {
-            "queue": "router_two"
-        }
+        # "options": {
+        #     "queue": "router_two"
+        # }
 
     }
 }

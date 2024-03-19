@@ -297,7 +297,7 @@ class CreateTaskView(APIView):
             crontab=schedule,
             name=task_name,
             task='drfUser.tasks.run_test_task',
-            queue='run_test_task'  # 设置队列名称
+            # queue='run_test_task'  # 设置队列名称
         )
 
         periodic_task.enabled = True
