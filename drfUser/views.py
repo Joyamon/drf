@@ -22,6 +22,12 @@ from drfUser.sign import login_sign
 from captcha.views import CaptchaStore, captcha_image
 import base64
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.gis.geoip2 import GeoIP2
+import geoip2
+from urllib.parse import urlparse
+from datetime import datetime
+from apscheduler.schedulers.blocking import BlockingScheduler
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 
 class UserView(APIView):
@@ -245,9 +251,6 @@ class GroupView(APIView):
             )
 
 
-from django_celery_beat.models import PeriodicTask, CrontabSchedule
-
-
 class CreateTaskView(APIView):
     """创建任务视图"""
     authentication_classes = []
@@ -318,6 +321,20 @@ class CreateTaskView(APIView):
         periodicTask = PeriodicTask.objects.filter(id=pk['id']).first()
         periodicTask.enabled = False  # 设置为禁用状态
         periodicTask.save()
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success'
+            }
+        )
+
+    def delete(self, request):
+        """
+        删除定时任务
+        """
+        pk = request.data
+        periodicTask = PeriodicTask.objects.filter(id=pk['id']).first()
+        periodicTask.delete()
         return Response(
             {
                 'status': status.HTTP_200_OK,
@@ -463,10 +480,6 @@ class CaptchaView(APIView):
         return Response(data=data)
 
 
-from datetime import datetime
-from apscheduler.schedulers.blocking import BlockingScheduler
-
-
 class APSSchedulerView(APIView):
     authentication_classes = []
 
@@ -485,11 +498,6 @@ class APSSchedulerView(APIView):
             raise
 
         return Response(data={'message': '定时任务添加成功！'})
-
-
-from django.contrib.gis.geoip2 import GeoIP2
-import geoip2
-from urllib.parse import urlparse
 
 
 class IpView(APIView):

@@ -1,4 +1,6 @@
 # DRF
+### 适宜人群
+   适合有一定python基础，了解django框架，想学习django+drf框架的人群
 
 #### 介绍
 
@@ -12,7 +14,9 @@
         c 登录，登出，修改密码，初始化密码
         d ...
         e ...
-    3.定时任务:django_celery_beat实现
+    3.django_celery_beat
+      (1).django_celery_beat实现定时任务，包括配置和通过接口添加定时任务
+      (2).django_apscheduler实现队列
     4.Authentication权限验证,使用pyjwt模块生成Token
     5.version 版本控制
     6.pagination分页
