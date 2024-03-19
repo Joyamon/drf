@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css">
+</head>
+<style>
+    #container {
+        margin-top: 200px;
+    }
+
+    #btn {
+        padding: 18px 122px;
+        line-height: 6px;
+        cursor: pointer;
+
+    }
+</style>
+
+<body>
+<div class="layui-container" id="container">
+    <div class="layui-row ">
+        <div class="layui-col-md4 layui-col-lg-offset4">
+
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="username" required lay-verify="required" placeholder="用户"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password" required lay-verify="required" placeholder="密码"
+                               autocomplete="off" class="layui-input">
+                    </div>
+
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="email" name="email" required lay-verify="required" placeholder="邮箱"
+                               autocomplete="off" class="layui-input">
+                    </div>
+
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button id='btn' lay-submit class="layui-btn layui-btn-sm layui-btn-normal" lay-filter="submit">
+                            注册
+                        </button>
+
+                    </div>
+                </div>
+                <div>
+                    <span style="float: right;">
+                        <a href="user_list.html" class="layui-font-blue">已有账号，去登录</a>
+                    </span>
+                </div>
+
+
+            </form>
+
+
+        </div>
+    </div>
+</div>
+<script src="../../static/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            $ = layui.jquery;
+
+            // 向user/user/提交数据
+            $('#btn').click(function () {
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/user/user/',
+                    type: 'post',
+                    data: {
+                        'username': $('input[name="username"]').val(),
+                        'password': $('input[name="password"]').val(),
+                        'email': $('input[name="email"]').val(),
+                    },
+                    success: function (data) {
+                        layer.msg('注册成功', {icon: 6, time: 3000,})
+
+                    }
+
+
+                })
+            })
+
+
+
+            // 监听提交信息
+             //form.on('submit(submit)', function (data) {
+             //    layer.msg('注册成功', {icon: 6, time: 2000,});
+
+             //    {#return false;#}
+
+             //});
+
+        },
+    )
+
+</script>
+</body>
+</html>

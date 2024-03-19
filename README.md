@@ -42,9 +42,11 @@
 6. 同步数据库 python manage.py migrate
 7. 运行项目 python manage.py runserver
 8. 启动redis服务
-9. 启动celery服务
-   * 启动worker服务:celery -A  drfcelery.main worker --loglevel=info -P eventlet --pool=solo >logs/celeryworker.log
-   * 启动beat服务:celery -A  drfcelery.main beat --loglevel=info >logs/celerybeat.log
+9. 启动celery服务 (注意: windows 启动worker服务需要安装eventlet库pip install eventlet)
+   * 启动worker服务:celery -A  drf worker --loglevel=info -P eventlet --pool=solo >logs/celeryworker.log
+   * 启动beat服务:celery -A  drf beat --loglevel=info >logs/celerybeat.log
+   * 启动队列: celery -A drf worker -l info -Q router_two -P eventlet
+   * 启动队列: celery -A drf worker -l info -Q router_one -P eventlet
 
 
 

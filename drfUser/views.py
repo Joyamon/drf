@@ -297,11 +297,27 @@ class CreateTaskView(APIView):
             crontab=schedule,
             name=task_name,
             task='drfUser.tasks.run_test_task',
+            queue='run_test_task'  # 设置队列名称
         )
 
         periodic_task.enabled = True
         periodic_task.save()
 
+        return Response(
+            {
+                'status': status.HTTP_200_OK,
+                'message': 'success'
+            }
+        )
+
+    def put(self, request):
+        """
+        禁止定时任务
+        """
+        pk = request.data
+        periodicTask = PeriodicTask.objects.filter(id=pk['id']).first()
+        periodicTask.enabled = False  # 设置为禁用状态
+        periodicTask.save()
         return Response(
             {
                 'status': status.HTTP_200_OK,

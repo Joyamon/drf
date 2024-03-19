@@ -9,11 +9,12 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+from celery.schedules import timedelta
 from pathlib import Path
 from celery.schedules import crontab
 import corsheaders
 from corsheaders.middleware import CorsMiddleware
+from kombu import Queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -120,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-Hans'
 TIME_ZONE = 'Asia/Shanghai'
-
 
 USE_I18N = True
 USE_L10N = True
@@ -321,9 +321,44 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+#
+# CELERY_TASK_ROUTES = {
+#     "drfUser.tasks.run_router_one": {'queue': 'router_one'},
+#     "drfUser.tasks.run_router_two": {'queue': 'router_two'},
+# }
+# CELERY_TASK_DEFAULT_QUEUE = 'default'
+# CELERY_TASK_QUEUES = (
+#     Queue('default', routing_key='default'),
+#     Queue('router_one', routing_key='router_one'),
+#     Queue('router_two', routing_key='router_two'),
+# )
+# CELERY_TASK_DEFAULT_EXCHANGE = 'tasks'
+# CELERY_TASK_DEFAULT_EXCHANGE_TYPE = 'topic'
+# CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
+# 增加任务队列
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "drfUser.tasks.run_test_task",
         "schedule": crontab(hour='18', minute="10"),
+        "options": {
+            "queue": "default"
+        }
+    },
+    "test_task1": {
+        "task": "drfUser.tasks.run_router_one",
+        "schedule": timedelta(seconds=5),
+        "options": {
+            "queue": "router_one"
+        }
+
+    },
+    "test_task2": {
+        "task": "drfUser.tasks.run_router_two",
+        "schedule": timedelta(seconds=10),
+        "options": {
+            "queue": "router_two"
+        }
+
     }
 }
